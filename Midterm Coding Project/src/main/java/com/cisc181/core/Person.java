@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import exceptions.PersonException;
+
 /*
  * comment
  */
@@ -22,6 +24,7 @@ public abstract class Person implements java.io.Serializable {
 		return FirstName;
 	}
 
+	
 	public void setFirstName(String FirstName) {
 		this.FirstName = FirstName;
 	}
@@ -46,8 +49,28 @@ public abstract class Person implements java.io.Serializable {
 		return DOB;
 	}
 
-	public void setDOB(Date DOB){
-		this.DOB = DOB;
+	public void setDOB(Date DOB) throws PersonException {
+		Calendar todayDate = Calendar.getInstance();
+		Calendar dateOfBirth = Calendar.getInstance();
+		
+		int age = 0;
+		dateOfBirth.setTime(DOB);
+		if (dateOfBirth.after(todayDate)) {
+			throw new IllegalArgumentException("Not possible to be born in the future");
+		}
+		age = todayDate.get(Calendar.YEAR) - dateOfBirth.get(Calendar.YEAR);
+		if (todayDate.get(Calendar.MONTH) < dateOfBirth.get(Calendar.MONTH)) {
+			age--;
+		} else if (todayDate.get(Calendar.MONTH) == dateOfBirth.get(Calendar.MONTH) 
+				&& todayDate.get(Calendar.DAY_OF_MONTH) < dateOfBirth.get(Calendar.DAY_OF_MONTH)) {
+			age--;
+		}
+		if (age < 100) {
+			this.DOB = DOB;
+		} else {
+			throw new PersonException(this);
+		}
+		
 		
 		
 	}
@@ -60,8 +83,16 @@ public abstract class Person implements java.io.Serializable {
 		return address;
 	}
 
-	public void setPhone(String newPhone_number) {
-		phone_number = newPhone_number;
+	public void setPhone(String newPhone_number) throws PersonException {
+		String regex = "^\\(?([0-9]{3})\\)?[-.\\s]?([0-9]{3})[-.\\s]?([0-9]{4})$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(newPhone_number);
+		if (matcher.matches()) {
+			this.phone_number = newPhone_number;
+		} else {
+			throw new PersonException(this);
+		}
+		
 	
 	}
 
@@ -94,9 +125,17 @@ public abstract class Person implements java.io.Serializable {
 		this.FirstName = FirstName;
 		this.MiddleName = MiddleName;
 		this.LastName = LastName;
-		this.setDOB(DOB);
+		try {
+			this.setDOB(DOB);
+		} catch (PersonException e) {
+			System.out.println("Date of birth cannot be more than 100 years old.");
+		}
 		this.address = Address;
-		this.setPhone(Phone_number);
+		try {
+			this.setPhone(Phone_number);
+		} catch (PersonException e) {
+			System.out.println("Your phone number format is not correct.");
+		}
 		this.email_address = Email;
 		
 	}

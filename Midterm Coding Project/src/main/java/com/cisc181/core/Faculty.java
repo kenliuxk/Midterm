@@ -15,6 +15,7 @@ public class Faculty extends Employee {
         return this.officeHours;
     }
     
+    
     public void setrank(int rank){
         this.rank = rank;
     }

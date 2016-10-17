@@ -13,6 +13,7 @@ public class Employee extends Person implements java.io.Serializable{
      */
     public Employee() {
     }
+    
 
     /**
      * <b>Employee Constructor</b> - Creates an instance of employee
